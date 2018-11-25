@@ -8,18 +8,18 @@ end
 
 # Plugin Struct
 
-immutable gvdevice_engine_t
-    initialize::Ptr{Void}
-    format::Ptr{Void}
-    finalize::Ptr{Void}
+struct gvdevice_engine_t
+    initialize::Ptr{Nothing}
+    format::Ptr{Nothing}
+    finalize::Ptr{Nothing}
 end
 
-immutable Pointf
+struct Pointf
     x::Float64
     y::Float64
 end
 
-immutable gvdevice_features_t
+struct gvdevice_features_t
     flags::Cint
     default_margin_x::Float64
     default_margin_y::Float64
@@ -29,7 +29,7 @@ immutable gvdevice_features_t
     default_dpi_y::Float64
 end
 
-immutable gvplugin_installed_t
+struct gvplugin_installed_t
     id::Cint
     ctype::Ptr{UInt8}
     quality::Cint
@@ -73,82 +73,82 @@ const LAYOUT_NOT_REQUIRED           = (1<<26)
 const OUTPUT_NOT_REQUIRED           = (1<<27)
 
 
-immutable gvplugin_api_t
+struct gvplugin_api_t
     api::Cint
     types::Ptr{gvplugin_installed_t}
 end
 
-immutable gvplugin_library_t
+struct gvplugin_library_t
     name::Ptr{UInt8}
     apis::Ptr{gvplugin_api_t}
 end
 
 # Job Struct
 
-immutable gvplugin_active_device_t
+struct gvplugin_active_device_t
     engine::Ptr{gvdevice_engine_t}
     id::Cint
     features::Ptr{gvdevice_features_t}
     ctype::Ptr{UInt8}
 end
 
-immutable gvplugin_active_render_t
-    engine::Ptr{Void}
+struct gvplugin_active_render_t
+    engine::Ptr{Nothing}
     id::Cint
-    features::Ptr{Void}
+    features::Ptr{Nothing}
     ctype::Ptr{UInt8}
 end
 
-immutable gvplugin_active_loadimage_t
-    engine::Ptr{Void}
+struct gvplugin_active_loadimage_t
+    engine::Ptr{Nothing}
     id::Cint
     ctype::Ptr{UInt8}
 end
 
-immutable gv_argvlist_t
+struct gv_argvlist_t
     argv::Ptr{Ptr{UInt8}}
     argc::Cint;
     alloc::Cint;
 end
 
-immutable Point{T}
+struct Point{T}
     x::T
     y::T
 end
 
-immutable Box{T}
+struct Box{T}
     topleft::Point{T}
     bottomright::Point{T}
 end
 
-immutable gvdevice_callback_t
-    refresh::Ptr{Void}          # void (*refresh) (GVJ_t * job);
-    button_press::Ptr{Void}     # void (*button_press) (GVJ_t * job, int button, pointf pointer);
-    button_release::Ptr{Void}   # void (*button_release) (GVJ_t * job, int button, pointf pointer);
-    motion::Ptr{Void}           # void (*motion) (GVJ_t * job, pointf pointer);
-    modify::Ptr{Void}           # void (*modify) (GVJ_t * job, const char *name, const char *value);
-    del::Ptr{Void}              # void (*del) (GVJ_t * job);  /* can't use "delete" 'cos C++ stole it */
-    read::Ptr{Void}             # void (*read) (GVJ_t * job, const char *filename, const char *layout);
-    layout::Ptr{Void}           # void (*layout) (GVJ_t * job, const char *layout);
-    render::Ptr{Void}           # void (*render) (GVJ_t * job, const char *format, const char *filename);
+struct gvdevice_callback_t
+    refresh::Ptr{Nothing}          # void (*refresh) (GVJ_t * job);
+    button_press::Ptr{Nothing}     # void (*button_press) (GVJ_t * job, int button, pointf pointer);
+    button_release::Ptr{Nothing}   # void (*button_release) (GVJ_t * job, int button, pointf pointer);
+    motion::Ptr{Nothing}           # void (*motion) (GVJ_t * job, pointf pointer);
+    modify::Ptr{Nothing}           # void (*modify) (GVJ_t * job, const char *name, const char *value);
+    del::Ptr{Nothing}              # void (*del) (GVJ_t * job);  /* can't use "delete" 'cos C++ stole it */
+    read::Ptr{Nothing}             # void (*read) (GVJ_t * job, const char *filename, const char *layout);
+    layout::Ptr{Nothing}           # void (*layout) (GVJ_t * job, const char *layout);
+    render::Ptr{Nothing}           # void (*render) (GVJ_t * job, const char *format, const char *filename);
 end
 
 # TODO: These are probably wrong
-type GVCOMMON_s
+mutable struct GVCOMMON_s
     info::Ptr{Ptr{UInt8}}
     cmdname::Ptr{UInt8}
     verbose::Cint
     config::UInt8
     auto_outfile_names::UInt8
-    errorfn::Ptr{Void}
-    show_boxes::Ptr{Ptr{Void}}
-    lib::Ptr{Ptr{Void}}
+    errorfn::Ptr{Nothing}
+    show_boxes::Ptr{Ptr{Nothing}}
+    lib::Ptr{Ptr{Nothing}}
     viewNum::Cint
-    builtins::Ptr{Void}
+    builtins::Ptr{Nothing}
     demand_loading::Cint
 end
 
-type GVC_s
+mutable struct GVC_s
     common::GVCOMMON_s
 
     config_path::Ptr{UInt8}
@@ -156,43 +156,43 @@ type GVC_s
 
     input_filenames::Ptr{Ptr{UInt8}}
 
-    gvgs::Ptr{Void}
-    gvg::Ptr{Void}
+    gvgs::Ptr{Nothing}
+    gvg::Ptr{Nothing}
 
     # Hack until tuples are properly inlined into types
-    apis0::Ptr{Void}
-    apis1::Ptr{Void}
-    apis2::Ptr{Void}
-    apis3::Ptr{Void}
-    apis4::Ptr{Void}
-    api0::Ptr{Void}
-    api1::Ptr{Void}
-    api2::Ptr{Void}
-    api3::Ptr{Void}
-    api4::Ptr{Void}
-    packages::Ptr{Void}
+    apis0::Ptr{Nothing}
+    apis1::Ptr{Nothing}
+    apis2::Ptr{Nothing}
+    apis3::Ptr{Nothing}
+    apis4::Ptr{Nothing}
+    api0::Ptr{Nothing}
+    api1::Ptr{Nothing}
+    api2::Ptr{Nothing}
+    api3::Ptr{Nothing}
+    api4::Ptr{Nothing}
+    packages::Ptr{Nothing}
 
     #  size_t (*write_fn) (GVJ_t *job, const char *s, size_t len);
-    write_fn::Ptr{Void}
+    write_fn::Ptr{Nothing}
 
     # More stuff I don't need right now
 end
 
-type GVJ_s
+mutable struct GVJ_s
     gvc::Ptr{GVC_s}
     next::Ptr{GVJ_s}
     next_active::Ptr{GVJ_s}
 
-    common::Ptr{Void}
+    common::Ptr{Nothing}
 
-    obj_state::Ptr{Void}
+    obj_state::Ptr{Nothing}
     input_filename::Ptr{UInt8}
     graph_index::Cint
 
     layout_type::Ptr{UInt8}
 
     output_filename::Ptr{UInt8}
-    output_file::Ptr{Void}
+    output_file::Ptr{Nothing}
     output_data::Ptr{UInt8}
     output_data_allocated::Cuint
     output_data_position::Cuint
@@ -209,10 +209,10 @@ type GVJ_s
     device_dpi::Pointf
     device_sets_dpi::UInt8
 
-    displat::Ptr{Void}
+    displat::Ptr{Nothing}
     screen::Cint
 
-    context::Ptr{Void}
+    context::Ptr{Nothing}
     external_context::UInt8
 
     imagedata::Ptr{UInt8}
@@ -265,8 +265,8 @@ type GVJ_s
     pointer::Point{Float64}
     oldpointer::Point{Float64}
 
-    current_obj::Ptr{Void}
-    selected_obj::Ptr{Void}
+    current_obj::Ptr{Nothing}
+    selected_obj::Ptr{Nothing}
 
     active_tooltip::Ptr{UInt8}
     selected_href::Ptr{UInt8}
@@ -274,80 +274,80 @@ type GVJ_s
     selected_obj_type_name::gv_argvlist_t
     selected_obj_attributes::gv_argvlist_t
 
-    window::Ptr{Void}
+    window::Ptr{Nothing}
 
-    keybindings::Ptr{Void}
+    keybindings::Ptr{Nothing}
     numkeys::Cint
-    keycodes::Ptr{Void}
+    keycodes::Ptr{Nothing}
 end
 
 # Disciplines
 
 
-immutable Agmemdisc_s      
+struct Agmemdisc_s      
     #void *(*open) (Agdisc_t*);  /* independent of other resources */
-    open::Ptr{Void}
+    open::Ptr{Nothing}
     #void *(*alloc) (void *state, size_t req);
-    alloc::Ptr{Void}
+    alloc::Ptr{Nothing}
     #void *(*resize) (void *state, void *ptr, size_t old, size_t req);
-    resize::Ptr{Void}
+    resize::Ptr{Nothing}
     # void (*free) (void *state, void *ptr);
-    free::Ptr{Void}
+    free::Ptr{Nothing}
     # void (*close) (void *state);
-    close::Ptr{Void}
+    close::Ptr{Nothing}
 end
 
-immutable Agiddisc_s
+struct Agiddisc_s
     # void *(*open) (Agraph_t * g, Agdisc_t*);    /* associated with a graph */
-    open::Ptr{Void}
+    open::Ptr{Nothing}
     # long (*map) (void *state, int objtype, char *str, unsigned long *id, int createflag);
-    map::Ptr{Void}
+    map::Ptr{Nothing}
     # long (*alloc) (void *state, int objtype, unsigned long id);
-    alloc::Ptr{Void}
+    alloc::Ptr{Nothing}
     #void (*free) (void *state, int objtype, unsigned long id);
-    free::Ptr{Void}
+    free::Ptr{Nothing}
     #char *(*print) (void *state, int objtype, unsigned long id);
-    print::Ptr{Void}
+    print::Ptr{Nothing}
     #void (*close) (void *state);
-    close::Ptr{Void}
+    close::Ptr{Nothing}
     #void (*idregister) (void *state, int objtype, void *obj);
-    idregister::Ptr{Void}
+    idregister::Ptr{Nothing}
 end
 
-immutable Agiodisc_s
+struct Agiodisc_s
     # int (*afread) (void *chan, char *buf, int bufsize);
-    afread::Ptr{Void}
+    afread::Ptr{Nothing}
     # int (*putstr) (void *chan, const char *str);
-    putstr::Ptr{Void}
+    putstr::Ptr{Nothing}
     # int (*flush) (void *chan);  /* sync */
-    flush::Ptr{Void}
+    flush::Ptr{Nothing}
 end
 
-immutable Agdisc_s
+struct Agdisc_s
     mem::Ptr{Agmemdisc_s}
     id::Ptr{Agiddisc_s}
     io::Ptr{Agiodisc_s}
 end
 
-function jl_afread(io::Ptr{Void}, buf::Ptr{UInt8}, bufsize::Cint)
+function jl_afread(io::Ptr{Nothing}, buf::Ptr{UInt8}, bufsize::Cint)
     #@show (io,buf,bufsize)
     ret = readbytes!(unsafe_pointer_to_objref(io)::IO,unsafe_wrap(Array,buf,Int(bufsize)))
     #@show ret
     convert(Cint,ret)
 end
 
-function jl_putstr(io::Ptr{Void}, str::Ptr{UInt8})
+function jl_putstr(io::Ptr{Nothing}, str::Ptr{UInt8})
     #@show (io,str)
     convert(Cint,write(unsafe_pointer_to_objref(io)::IO,unsafe_wrap(Array,str,Int(ccall(:strlen,Csize_t,(Ptr{UInt8},),str)))))::Cint
 end
 
-jl_flush(io::Ptr{Void}) = convert(Cint,0)
+jl_flush(io::Ptr{Nothing}) = convert(Cint,0)
 
 
 const JuliaIODisc = [Agiodisc_s(
-    cfunction(jl_afread,Cint,(Ptr{Void},Ptr{UInt8},Cint)),
-    cfunction(jl_putstr,Cint,(Ptr{Void},Ptr{UInt8})),
-    cfunction(jl_flush,Cint,(Ptr{Void},))
+    cfunction(jl_afread,Cint,(Ptr{Nothing},Ptr{UInt8},Cint)),
+    cfunction(jl_putstr,Cint,(Ptr{Nothing},Ptr{UInt8})),
+    cfunction(jl_flush,Cint,(Ptr{Nothing},))
 )]
 
 
@@ -361,10 +361,10 @@ null(::Type{gvplugin_api_t}) = gvplugin_api_t(Int32(0),convert(Ptr{gvplugin_inst
 
 # API - Context
 
-type Context
-    handle::Ptr{Void}
+mutable struct Context
+    handle::Ptr{Nothing}
     function Context() 
-        this = new(ccall((:gvContext,gvc),Ptr{Void},()))
+        this = new(ccall((:gvContext,gvc),Ptr{Nothing},()))
         finalizer(this,free)
         this
     end
@@ -372,7 +372,7 @@ end
 
 function free(t::Context) 
     if t.handle != C_NULL
-        ccall((:gvFreeContext,gvc), Void, (Ptr{Void},), t.handle)
+        ccall((:gvFreeContext,gvc), Nothing, (Ptr{Nothing},), t.handle)
     end
     t.handle = C_NULL
 end
@@ -381,10 +381,10 @@ end
 
 export Graph
 
-type Graph
-    handle::Ptr{Void}
+mutable struct Graph
+    handle::Ptr{Nothing}
     didlayout::Bool
-    function Graph(p::Ptr{Void})
+    function Graph(p::Ptr{Nothing})
         this = new(p,false)
         finalizer(this,free)
         this
@@ -393,12 +393,12 @@ end
 
 function free(g::Graph)
     if g.handle != C_NULL
-        ccall((:agclose,cgraph), Cint, (Ptr{Void},), g.handle)
+        ccall((:agclose,cgraph), Cint, (Ptr{Nothing},), g.handle)
     end
     g.handle = C_NULL
 end
 
-Graph(graph::IO) = Graph(ccall((:agread,cgraph),Ptr{Void},(Any,Ptr{Void}),graph,[Agdisc_s(
+Graph(graph::IO) = Graph(ccall((:agread,cgraph),Ptr{Nothing},(Any,Ptr{Nothing}),graph,[Agdisc_s(
     cglobal((:AgMemDisc,cgraph)),
     cglobal((:AgIdDisc,cgraph)),
     pointer(JuliaIODisc)
@@ -408,25 +408,25 @@ Graph(graph::String) = Graph(Vector{UInt8}(graph))
 
 function layout!(g::Graph;engine="neato", context = default_context)
     @assert g.handle != C_NULL
-    ccall((:gvLayout,gvc),Cint,(Ptr{Void},Ptr{Void},Ptr{UInt8}),context.handle,g.handle,engine)
+    ccall((:gvLayout,gvc),Cint,(Ptr{Nothing},Ptr{Nothing},Ptr{UInt8}),context.handle,g.handle,engine)
     g.didlayout = true
 end
 
-render_x11(c::Context,g::Graph) = ccall((:gvRender,gvc),Cint,(Ptr{Void},Ptr{Void},Ptr{UInt8},Ptr{Void}),c.handle,g.handle,"x11",C_NULL)
-render_jobs(c::Context,g::Graph) = ccall((:gvRenderJobs,gvc),Cint,(Ptr{Void},Ptr{Void}),c.handle,g.handle)
+render_x11(c::Context,g::Graph) = ccall((:gvRender,gvc),Cint,(Ptr{Nothing},Ptr{Nothing},Ptr{UInt8},Ptr{Nothing}),c.handle,g.handle,"x11",C_NULL)
+render_jobs(c::Context,g::Graph) = ccall((:gvRenderJobs,gvc),Cint,(Ptr{Nothing},Ptr{Nothing}),c.handle,g.handle)
 
 # Render
 
 # IO device
 
-type IODeviceState
+mutable struct IODeviceState
     io::IO
-    oldwritefn::Ptr{Void}
+    oldwritefn::Ptr{Nothing}
 end
 
 const active_devices = ObjectIdDict()
 
-function jlio_write(job::Ptr{Void},s::Ptr{UInt8},len::Csize_t)
+function jlio_write(job::Ptr{Nothing},s::Ptr{UInt8},len::Csize_t)
     job = unsafe_load(convert(Ptr{GVJ_s},job))
     ioc = unsafe_pointer_to_objref(job.context)::IODeviceState
     write(ioc.io,unsafe_wrap(Array,s,Int(len)))
@@ -436,24 +436,24 @@ end
 # determined by counting bytes ;)
 const WRITEFN_OFFSET = 200
 
-function julia_io_initialize(firstjob::Ptr{Void})
+function julia_io_initialize(firstjob::Ptr{Nothing})
     #@show firstjob
     firstjob = convert(Ptr{GVJ_s},firstjob)
     job = unsafe_load(firstjob)
     # Temporarily put in our custom write function
     ioc = unsafe_pointer_to_objref(job.context)::IODeviceState
-    writefnptr = convert(Ptr{Ptr{Void}},job.gvc+WRITEFN_OFFSET)
+    writefnptr = convert(Ptr{Ptr{Nothing}},job.gvc+WRITEFN_OFFSET)
     ioc.oldwritefn = unsafe_load(writefnptr)
-    unsafe_store!(writefnptr,cfunction(jlio_write,Csize_t,(Ptr{Void},Ptr{UInt8},Csize_t)))
+    unsafe_store!(writefnptr,cfunction(jlio_write,Csize_t,(Ptr{Nothing},Ptr{UInt8},Csize_t)))
     # This function has void return
     nothing
 end
-function julia_io_finalize(firstjob::Ptr{Void}) 
+function julia_io_finalize(firstjob::Ptr{Nothing}) 
     # Reset the write pointer we changed in julia_io_initialize
     firstjob = convert(Ptr{GVJ_s},firstjob)
     job = unsafe_load(firstjob)
     ioc = unsafe_pointer_to_objref(job.context)::IODeviceState
-    writefnptr = convert(Ptr{Ptr{Void}},job.gvc+WRITEFN_OFFSET)
+    writefnptr = convert(Ptr{Ptr{Nothing}},job.gvc+WRITEFN_OFFSET)
     unsafe_store!(writefnptr,ioc.oldwritefn)
     # Also remove it from the gc preserve dict
     haskey(active_devices,ioc) && pop!(active_devices,ioc)
@@ -462,7 +462,7 @@ end
 
 const default_context = GraphViz.Context()
 
-const julia_io_engine = [ gvdevice_engine_t(cfunction(julia_io_initialize,Void,(Ptr{Void},)),C_NULL,cfunction(julia_io_finalize,Void,(Ptr{Void},))) ]
+const julia_io_engine = [ gvdevice_engine_t(cfunction(julia_io_initialize,Nothing,(Ptr{Nothing},)),C_NULL,cfunction(julia_io_finalize,Nothing,(Ptr{Nothing},))) ]
 const julia_io_features = [ gvdevice_features_t(Int32(GVDEVICE_DOES_TRUECOLOR|GVDEVICE_DOES_LAYERS),0.,0.,0.,0.,72.,72.) ]
 const julia_io_name = Vector{UInt8}("julia_io:svg")
 const julia_io_libname = Vector{UInt8}("julia_io")
@@ -477,7 +477,7 @@ const julia_io_api =
         null(gvplugin_api_t)
     ]
 
-add_julia_io!(c::Context) = ccall((:gvAddLibrary,gvc),Void,(Ptr{Void},Ptr{gvplugin_library_t}),c.handle,[gvplugin_library_t(pointer(julia_io_libname),pointer(julia_io_api))])
+add_julia_io!(c::Context) = ccall((:gvAddLibrary,gvc),Nothing,(Ptr{Nothing},Ptr{gvplugin_library_t}),c.handle,[gvplugin_library_t(pointer(julia_io_libname),pointer(julia_io_api))])
 
 function render(io::IO,g::GraphViz.Graph; context = default_context, format="julia_io:svg")
     GraphViz.add_julia_io!(context)
@@ -486,7 +486,7 @@ function render(io::IO,g::GraphViz.Graph; context = default_context, format="jul
     end
     state = IODeviceState(io,C_NULL)
     active_devices[state] = state
-    ccall((:gvRenderContext,GraphViz.gvc),Cint,(Ptr{Void},Ptr{Void},Ptr{UInt8},Any),context.handle,g.handle,format,state)
+    ccall((:gvRenderContext,GraphViz.gvc),Cint,(Ptr{Nothing},Ptr{Nothing},Ptr{UInt8},Any),context.handle,g.handle,format,state)
 end
 
 function Base.show(io::IO, ::MIME"image/svg+xml", x::Graph)
@@ -507,7 +507,7 @@ end
 if has_cairo
     using Cairo
     
-    function cairo_initialize(firstjob::Ptr{Void})
+    function cairo_initialize(firstjob::Ptr{Nothing})
         firstjob = convert(Ptr{GVJ_s},firstjob)
         job = unsafe_load(firstjob)
         if job.context != C_NULL
@@ -527,28 +527,28 @@ if has_cairo
 
     global last_surface = nothing
 
-    function cairo_finalize(firstjob::Ptr{Void})
+    function cairo_finalize(firstjob::Ptr{Nothing})
         #=firstjob = convert(Ptr{GVJ_s},firstjob)
         job = unsafe_load(firstjob)
         if last_surface == firstjob
-        surface = ccall((:cairo_get_target,Cairo._jl_libcairo),Ptr{Void},(Ptr{Void},),job.context)
+        surface = ccall((:cairo_get_target,Cairo._jl_libcairo),Ptr{Nothing},(Ptr{Nothing},),job.context)
         last_surface = CairoSurface(surface, job.width, job.height)
         end=#
         nothing
     end
 
-    function cairo_format(firstjob::Ptr{Void})
+    function cairo_format(firstjob::Ptr{Nothing})
         global last_surface
         firstjob = convert(Ptr{GVJ_s},firstjob)
         job = unsafe_load(firstjob)
         if last_surface == firstjob
-            surface = ccall((:cairo_get_target,Cairo._jl_libcairo),Ptr{Void},(Ptr{Void},),job.context)
+            surface = ccall((:cairo_get_target,Cairo._jl_libcairo),Ptr{Nothing},(Ptr{Nothing},),job.context)
             last_surface = CairoSurface(surface, job.width, job.height)
         end
         nothing
     end
 
-    const generic_cairo_engine = [ gvdevice_engine_t(cfunction(cairo_initialize,Void,(Ptr{Void},)),cfunction(cairo_format,Void,(Ptr{Void},)),cfunction(cairo_finalize,Void,(Ptr{Void},))) ]
+    const generic_cairo_engine = [ gvdevice_engine_t(cfunction(cairo_initialize,Nothing,(Ptr{Nothing},)),cfunction(cairo_format,Nothing,(Ptr{Nothing},)),cfunction(cairo_finalize,Nothing,(Ptr{Nothing},))) ]
     const generic_cairo_features = [ gvdevice_features_t(Int32(0),0.,0.,0.,0.,96.,96.) ]
     const generic_cairo_features_interactive = [ gvdevice_features_t(Int32(0),0.,0.,0.,0.,96.,96.) ]
     const generic_cairo_name = Vector{UInt8}("julia:cairo")
@@ -564,14 +564,14 @@ if has_cairo
             null(gvplugin_api_t)
         ]
 
-    add_julia_cairo!(c::Context) = ccall((:gvAddLibrary,gvc),Void,(Ptr{Void},Ptr{gvplugin_library_t}),c.handle,[gvplugin_library_t(pointer(generic_cairo_libname),pointer(generic_cairo_api))])
+    add_julia_cairo!(c::Context) = ccall((:gvAddLibrary,gvc),Nothing,(Ptr{Nothing},Ptr{gvplugin_library_t}),c.handle,[gvplugin_library_t(pointer(generic_cairo_libname),pointer(generic_cairo_api))])
 
     function render(c::CairoContext,g::GraphViz.Graph; context = default_context, format="julia:cairo")
         GraphViz.add_julia_cairo!(context)
         if !g.didlayout
             error("Must call layout before calling render!")
         end
-        ccall((:gvRenderContext,GraphViz.gvc),Cint,(Ptr{Void},Ptr{Void},Ptr{UInt8},Any),context.handle,g.handle,format,c)
+        ccall((:gvRenderContext,GraphViz.gvc),Cint,(Ptr{Nothing},Ptr{Nothing},Ptr{UInt8},Any),context.handle,g.handle,format,c)
     end
 
     function cairo_render(g::GraphViz.Graph; context = default_context, format="julia:cairo")
@@ -580,7 +580,7 @@ if has_cairo
         if !g.didlayout
             error("Must call layout before calling render!")
         end
-        ccall((:gvRenderContext,GraphViz.gvc),Cint,(Ptr{Void},Ptr{Void},Ptr{UInt8},Ptr{Void}),context.handle,g.handle,format,C_NULL)
+        ccall((:gvRenderContext,GraphViz.gvc),Cint,(Ptr{Nothing},Ptr{Nothing},Ptr{UInt8},Ptr{Nothing}),context.handle,g.handle,format,C_NULL)
         surface = last_surface
         last_surface = nothing
         return surface
@@ -596,7 +596,7 @@ if has_cairo
     if isdir(Pkg.dir("Gtk"))
         using Gtk
 
-        function gtk_initialize(firstjob::Ptr{Void})
+        function gtk_initialize(firstjob::Ptr{Nothing})
             firstjob = convert(Ptr{GVJ_s},firstjob)
             job = unsafe_load(firstjob)
             c = unsafe_pointer_to_objref(job.context)::Gtk.Canvas
@@ -607,7 +607,7 @@ if has_cairo
             nothing
         end
 
-        function gtk_finalize(firstjob::Ptr{Void})
+        function gtk_finalize(firstjob::Ptr{Nothing})
             firstjob = convert(Ptr{GVJ_s},firstjob)
             job = unsafe_load(firstjob)
             c = unsafe_pointer_to_objref(job.window)::Gtk.Canvas
@@ -626,9 +626,9 @@ if has_cairo
             unsafe_store!(jobp,job)
             println(job.callbacks)
             println(unsafe_load(job.callbacks).refresh)
-            ccall(unsafe_load(job.callbacks).refresh,Void,(Ptr{Void},),jobp)
+            ccall(unsafe_load(job.callbacks).refresh,Nothing,(Ptr{Nothing},),jobp)
         end
-        const gtk_engine = [ gvdevice_engine_t(cfunction(gtk_initialize,Void,(Ptr{Void},)),C_NULL,cfunction(gtk_finalize,Void,(Ptr{Void},))) ]
+        const gtk_engine = [ gvdevice_engine_t(cfunction(gtk_initialize,Nothing,(Ptr{Nothing},)),C_NULL,cfunction(gtk_finalize,Nothing,(Ptr{Nothing},))) ]
         const gtk_features = [ gvdevice_features_t(Int32(GVDEVICE_EVENTS),0.,0.,0.,0.,96.,96.) ]
         const gtk_name = Vector{UInt8}("julia_gtk:cairo")
         const gtk_libname = Vector{UInt8}("julia_gtk:cairo")
@@ -643,12 +643,12 @@ if has_cairo
                 null(gvplugin_api_t)
             ]
 
-        add_julia_gtk!(c::Context) = ccall((:gvAddLibrary,gvc),Void,(Ptr{Void},Ptr{gvplugin_library_t}),c.handle,[gvplugin_library_t(pointer(gtk_libname),pointer(gtk_api))])
+        add_julia_gtk!(c::Context) = ccall((:gvAddLibrary,gvc),Nothing,(Ptr{Nothing},Ptr{gvplugin_library_t}),c.handle,[gvplugin_library_t(pointer(gtk_libname),pointer(gtk_api))])
 
         function render(c::Gtk.Canvas,cg::Context,g::Graph) 
             @async begin
                 add_julia_gtk!(cg)
-                ccall((:gvRenderContext,gvc),Cint,(Ptr{Void},Ptr{Void},Ptr{UInt8},Any),cg.handle,g.handle,"julia_gtk",c)    
+                ccall((:gvRenderContext,gvc),Cint,(Ptr{Nothing},Ptr{Nothing},Ptr{UInt8},Any),cg.handle,g.handle,"julia_gtk",c)    
             end
             nothing
         end
@@ -656,11 +656,11 @@ if has_cairo
     =#
 end
 
-graph_plugins(c::Context) = Graph(ccall((:gvPluginsGraph,gvc),Ptr{Void},(Ptr{Void},),c.handle))
+graph_plugins(c::Context) = Graph(ccall((:gvPluginsGraph,gvc),Ptr{Nothing},(Ptr{Nothing},),c.handle))
 
 function listPlugins(c,kind)
     s = Array(Cint,1)
-    r = ccall((:gvPluginList,gvc),Ptr{Ptr{UInt8}},(Ptr{Void},Ptr{UInt8},Ptr{Cint},Ptr{UInt8}),c.handle,kind,s,C_NULL)
+    r = ccall((:gvPluginList,gvc),Ptr{Ptr{UInt8}},(Ptr{Nothing},Ptr{UInt8},Ptr{Cint},Ptr{UInt8}),c.handle,kind,s,C_NULL)
     if r == C_NULL
         error("No Plugins available")
     end

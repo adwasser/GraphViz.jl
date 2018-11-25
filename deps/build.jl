@@ -1,8 +1,14 @@
 using BinDeps
+using Pkg
 
 # Configuration / Autodetections
-const x11 = is_unix() ? !is_apple() : false
-const gtk = isdir(Pkg.dir("Gtk"))
+const x11 = Sys.isunix() ? !Sys.isapple() : false
+const gtk = try
+    import Gtk
+    isdir(joinpath(dirname(pathof(Gtk))))
+catch
+    false
+end
 
 @BinDeps.setup
 
@@ -13,7 +19,7 @@ gvc = library_dependency("gvc",aliases = ["libgvc"])
 
 graphviz = [cgraph,gvc]
 
-if is_apple()
+if Sys.isapple()
     using Homebrew
     provides( Homebrew.HB, "graphviz", graphviz, os = :Darwin, preload = """
     module GraphVizInit

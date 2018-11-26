@@ -1,5 +1,6 @@
 using BinDeps
 using Pkg
+using Libdl
 
 # Configuration / Autodetections
 const x11 = Sys.isunix() ? !Sys.isapple() : false

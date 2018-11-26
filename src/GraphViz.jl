@@ -345,9 +345,9 @@ jl_flush(io::Ptr{Nothing}) = convert(Cint,0)
 
 
 const JuliaIODisc = [Agiodisc_s(
-    cfunction(jl_afread,Cint,(Ptr{Nothing},Ptr{UInt8},Cint)),
-    cfunction(jl_putstr,Cint,(Ptr{Nothing},Ptr{UInt8})),
-    cfunction(jl_flush,Cint,(Ptr{Nothing},))
+    @cfunction(jl_afread,Cint,(Ptr{Nothing},Ptr{UInt8},Cint)),
+    @cfunction(jl_putstr,Cint,(Ptr{Nothing},Ptr{UInt8})),
+    @cfunction(jl_flush,Cint,(Ptr{Nothing},))
 )]
 
 
@@ -365,7 +365,7 @@ mutable struct Context
     handle::Ptr{Nothing}
     function Context() 
         this = new(ccall((:gvContext,gvc),Ptr{Nothing},()))
-        finalizer(this,free)
+        finalizer(free, this)
         this
     end
 end
@@ -386,7 +386,7 @@ mutable struct Graph
     didlayout::Bool
     function Graph(p::Ptr{Nothing})
         this = new(p,false)
-        finalizer(this,free)
+        finalizer(free, this)
         this
     end
 end
@@ -424,7 +424,7 @@ mutable struct IODeviceState
     oldwritefn::Ptr{Nothing}
 end
 
-const active_devices = ObjectIdDict()
+const active_devices = IdDict{Any, Any}
 
 function jlio_write(job::Ptr{Nothing},s::Ptr{UInt8},len::Csize_t)
     job = unsafe_load(convert(Ptr{GVJ_s},job))
@@ -444,7 +444,7 @@ function julia_io_initialize(firstjob::Ptr{Nothing})
     ioc = unsafe_pointer_to_objref(job.context)::IODeviceState
     writefnptr = convert(Ptr{Ptr{Nothing}},job.gvc+WRITEFN_OFFSET)
     ioc.oldwritefn = unsafe_load(writefnptr)
-    unsafe_store!(writefnptr,cfunction(jlio_write,Csize_t,(Ptr{Nothing},Ptr{UInt8},Csize_t)))
+    unsafe_store!(writefnptr,@cfunction(jlio_write,Csize_t,(Ptr{Nothing},Ptr{UInt8},Csize_t)))
     # This function has void return
     nothing
 end
@@ -462,7 +462,7 @@ end
 
 const default_context = GraphViz.Context()
 
-const julia_io_engine = [ gvdevice_engine_t(cfunction(julia_io_initialize,Nothing,(Ptr{Nothing},)),C_NULL,cfunction(julia_io_finalize,Nothing,(Ptr{Nothing},))) ]
+const julia_io_engine = [ gvdevice_engine_t(@cfunction(julia_io_initialize,Nothing,(Ptr{Nothing},)),C_NULL,@cfunction(julia_io_finalize,Nothing,(Ptr{Nothing},))) ]
 const julia_io_features = [ gvdevice_features_t(Int32(GVDEVICE_DOES_TRUECOLOR|GVDEVICE_DOES_LAYERS),0.,0.,0.,0.,72.,72.) ]
 const julia_io_name = Vector{UInt8}("julia_io:svg")
 const julia_io_libname = Vector{UInt8}("julia_io")
@@ -548,7 +548,7 @@ if has_cairo
         nothing
     end
 
-    const generic_cairo_engine = [ gvdevice_engine_t(cfunction(cairo_initialize,Nothing,(Ptr{Nothing},)),cfunction(cairo_format,Nothing,(Ptr{Nothing},)),cfunction(cairo_finalize,Nothing,(Ptr{Nothing},))) ]
+    const generic_cairo_engine = [ gvdevice_engine_t(@cfunction(cairo_initialize,Nothing,(Ptr{Nothing},)),@cfunction(cairo_format,Nothing,(Ptr{Nothing},)),@cfunction(cairo_finalize,Nothing,(Ptr{Nothing},))) ]
     const generic_cairo_features = [ gvdevice_features_t(Int32(0),0.,0.,0.,0.,96.,96.) ]
     const generic_cairo_features_interactive = [ gvdevice_features_t(Int32(0),0.,0.,0.,0.,96.,96.) ]
     const generic_cairo_name = Vector{UInt8}("julia:cairo")
@@ -628,7 +628,7 @@ if has_cairo
             println(unsafe_load(job.callbacks).refresh)
             ccall(unsafe_load(job.callbacks).refresh,Nothing,(Ptr{Nothing},),jobp)
         end
-        const gtk_engine = [ gvdevice_engine_t(cfunction(gtk_initialize,Nothing,(Ptr{Nothing},)),C_NULL,cfunction(gtk_finalize,Nothing,(Ptr{Nothing},))) ]
+        const gtk_engine = [ gvdevice_engine_t(@cfunction(gtk_initialize,Nothing,(Ptr{Nothing},)),C_NULL,@cfunction(gtk_finalize,Nothing,(Ptr{Nothing},))) ]
         const gtk_features = [ gvdevice_features_t(Int32(GVDEVICE_EVENTS),0.,0.,0.,0.,96.,96.) ]
         const gtk_name = Vector{UInt8}("julia_gtk:cairo")
         const gtk_libname = Vector{UInt8}("julia_gtk:cairo")

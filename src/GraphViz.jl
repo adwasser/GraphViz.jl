@@ -496,103 +496,94 @@ function Base.show(io::IO, ::MIME"image/svg+xml", x::Graph)
     render(io,x)
 end
 
-# Cairo device
-const has_cairo = try
-    import Cairo
-    isdir(joinpath(dirname(pathof(Cairo))))
-catch
-    false
-end
-    
-if has_cairo
-    using Cairo
-    
-    function cairo_initialize(firstjob::Ptr{Nothing})
-        firstjob = convert(Ptr{GVJ_s},firstjob)
-        job = unsafe_load(firstjob)
-        if job.context != C_NULL
-            c = unsafe_pointer_to_objref(job.context)::CairoContext
-            job.context = c.ptr
-            job.external_context    = 0x1
-            job.width = width(c.surface)
-            job.height = height(c.surface)
-            unsafe_store!(firstjob,job)
-        else
-            job.external_context = 1
-            unsafe_store!(firstjob,job)
-            global last_surface = firstjob
-        end
-        nothing
+using Cairo
+
+function cairo_initialize(firstjob::Ptr{Nothing})
+    firstjob = convert(Ptr{GVJ_s},firstjob)
+    job = unsafe_load(firstjob)
+    if job.context != C_NULL
+        c = unsafe_pointer_to_objref(job.context)::CairoContext
+        job.context = c.ptr
+        job.external_context    = 0x1
+        job.width = width(c.surface)
+        job.height = height(c.surface)
+        unsafe_store!(firstjob,job)
+    else
+        job.external_context = 1
+        unsafe_store!(firstjob,job)
+        global last_surface = firstjob
     end
+    nothing
+end
 
-    global last_surface = nothing
+global last_surface = nothing
 
-    function cairo_finalize(firstjob::Ptr{Nothing})
-        #=firstjob = convert(Ptr{GVJ_s},firstjob)
-        job = unsafe_load(firstjob)
-        if last_surface == firstjob
+function cairo_finalize(firstjob::Ptr{Nothing})
+    #=firstjob = convert(Ptr{GVJ_s},firstjob)
+    job = unsafe_load(firstjob)
+    if last_surface == firstjob
+    surface = ccall((:cairo_get_target,Cairo._jl_libcairo),Ptr{Nothing},(Ptr{Nothing},),job.context)
+    last_surface = CairoSurface(surface, job.width, job.height)
+    end=#
+    nothing
+end
+
+function cairo_format(firstjob::Ptr{Nothing})
+    global last_surface
+    firstjob = convert(Ptr{GVJ_s},firstjob)
+    job = unsafe_load(firstjob)
+    if last_surface == firstjob
         surface = ccall((:cairo_get_target,Cairo._jl_libcairo),Ptr{Nothing},(Ptr{Nothing},),job.context)
         last_surface = CairoSurface(surface, job.width, job.height)
-        end=#
-        nothing
     end
-
-    function cairo_format(firstjob::Ptr{Nothing})
-        global last_surface
-        firstjob = convert(Ptr{GVJ_s},firstjob)
-        job = unsafe_load(firstjob)
-        if last_surface == firstjob
-            surface = ccall((:cairo_get_target,Cairo._jl_libcairo),Ptr{Nothing},(Ptr{Nothing},),job.context)
-            last_surface = CairoSurface(surface, job.width, job.height)
-        end
-        nothing
-    end
-
-    const generic_cairo_engine = [ gvdevice_engine_t(@cfunction(cairo_initialize,Nothing,(Ptr{Nothing},)),@cfunction(cairo_format,Nothing,(Ptr{Nothing},)),@cfunction(cairo_finalize,Nothing,(Ptr{Nothing},))) ]
-    const generic_cairo_features = [ gvdevice_features_t(Int32(0),0.,0.,0.,0.,96.,96.) ]
-    const generic_cairo_features_interactive = [ gvdevice_features_t(Int32(0),0.,0.,0.,0.,96.,96.) ]
-    const generic_cairo_name = Vector{UInt8}("julia:cairo")
-    const generic_cairo_libname = Vector{UInt8}("julia:cairo")
-    const generic_cairo_device = 
-        [ 
-            gvplugin_installed_t(Int32(0),pointer(generic_cairo_name), Int32(0), pointer(generic_cairo_engine), pointer(generic_cairo_features));
-            null(gvplugin_installed_t)
-        ]
-    const generic_cairo_api = 
-        [
-            gvplugin_api_t(API_device, pointer(generic_cairo_device))
-            null(gvplugin_api_t)
-        ]
-
-    add_julia_cairo!(c::Context) = ccall((:gvAddLibrary,gvc),Nothing,(Ptr{Nothing},Ptr{gvplugin_library_t}),c.handle,[gvplugin_library_t(pointer(generic_cairo_libname),pointer(generic_cairo_api))])
-
-    function render(c::CairoContext,g::GraphViz.Graph; context = default_context, format="julia:cairo")
-        GraphViz.add_julia_cairo!(context)
-        if !g.didlayout
-            error("Must call layout before calling render!")
-        end
-        ccall((:gvRenderContext,GraphViz.gvc),Cint,(Ptr{Nothing},Ptr{Nothing},Ptr{UInt8},Any),context.handle,g.handle,format,c)
-    end
-
-    function cairo_render(g::GraphViz.Graph; context = default_context, format="julia:cairo")
-        global last_surface
-        GraphViz.add_julia_cairo!(context)
-        if !g.didlayout
-            error("Must call layout before calling render!")
-        end
-        ccall((:gvRenderContext,GraphViz.gvc),Cint,(Ptr{Nothing},Ptr{Nothing},Ptr{UInt8},Ptr{Nothing}),context.handle,g.handle,format,C_NULL)
-        surface = last_surface
-        last_surface = nothing
-        return surface
-    end
-
-    function Base.show(io::IO, m::MIME"image/png", x::Graph)
-        if !x.didlayout
-            layout!(x,engine="dot")
-        end
-        show(io, m, cairo_render(x))
-    end
+    nothing
 end
+
+const generic_cairo_engine = [ gvdevice_engine_t(@cfunction(cairo_initialize,Nothing,(Ptr{Nothing},)),@cfunction(cairo_format,Nothing,(Ptr{Nothing},)),@cfunction(cairo_finalize,Nothing,(Ptr{Nothing},))) ]
+const generic_cairo_features = [ gvdevice_features_t(Int32(0),0.,0.,0.,0.,96.,96.) ]
+const generic_cairo_features_interactive = [ gvdevice_features_t(Int32(0),0.,0.,0.,0.,96.,96.) ]
+const generic_cairo_name = Vector{UInt8}("julia:cairo")
+const generic_cairo_libname = Vector{UInt8}("julia:cairo")
+const generic_cairo_device = 
+    [ 
+        gvplugin_installed_t(Int32(0),pointer(generic_cairo_name), Int32(0), pointer(generic_cairo_engine), pointer(generic_cairo_features));
+        null(gvplugin_installed_t)
+    ]
+const generic_cairo_api = 
+    [
+        gvplugin_api_t(API_device, pointer(generic_cairo_device))
+        null(gvplugin_api_t)
+    ]
+
+add_julia_cairo!(c::Context) = ccall((:gvAddLibrary,gvc),Nothing,(Ptr{Nothing},Ptr{gvplugin_library_t}),c.handle,[gvplugin_library_t(pointer(generic_cairo_libname),pointer(generic_cairo_api))])
+
+function render(c::CairoContext,g::GraphViz.Graph; context = default_context, format="julia:cairo")
+    GraphViz.add_julia_cairo!(context)
+    if !g.didlayout
+        error("Must call layout before calling render!")
+    end
+    ccall((:gvRenderContext,GraphViz.gvc),Cint,(Ptr{Nothing},Ptr{Nothing},Ptr{UInt8},Any),context.handle,g.handle,format,c)
+end
+
+function cairo_render(g::GraphViz.Graph; context = default_context, format="julia:cairo")
+    global last_surface
+    GraphViz.add_julia_cairo!(context)
+    if !g.didlayout
+        error("Must call layout before calling render!")
+    end
+    ccall((:gvRenderContext,GraphViz.gvc),Cint,(Ptr{Nothing},Ptr{Nothing},Ptr{UInt8},Ptr{Nothing}),context.handle,g.handle,format,C_NULL)
+    surface = last_surface
+    last_surface = nothing
+    return surface
+end
+
+function Base.show(io::IO, m::MIME"image/png", x::Graph)
+    if !x.didlayout
+        layout!(x,engine="dot")
+    end
+    show(io, m, cairo_render(x))
+end
+
 #=
 if isdir(Pkg.dir("Gtk"))
     using Gtk
